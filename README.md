@@ -1,22 +1,21 @@
 # Image middlware server
----
-This module acts as a middleware server handles uploading/getting images to/from **Amazon S3** servers with different sizes.
+This module acts as a middleware server handles uploading/getting images to/from **Amazon S3** servers with different sizes\.
 ## Getting started
----
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes\.
 ### Pre-requisites
 - Get [Git](https://git-scm.com/downloads) and [NodeJS](https://nodejs.org/en/download/) installed on your machine
 - Get an [Amazon Simple Storage Service](https://aws.amazon.com/s3/) \(Amazon S3\) valid account
-- Get [Postman](https://www.getpostman.com/) installed on your machine (either desktop/browser version)
+- Get [Postman](https://www.getpostman.com/) installed on your machine \(either desktop/browser version\)
+
 ### Installation
 - Clone the repo locally: ```git clone https://github.com/goodsensejp/image-middleware.git```
 - Navigate inside the repo folder ```cd image-middlware```
 - Install its dependencies: ```npm install```
 - Set the following values in your machine's environment path:   
         \(_If you don't know how,_ [click here](https://java.com/en/download/help/path.xml)\)
-	* AWS\_ACCESS\_KEY\_ID
-	* AWS\_SECRET\_ACCESS\_KEY
-	* PORT (_Optional, just in case you want to run the server locally_, default:9999)
+    * AWS\_ACCESS\_KEY\_ID
+    * AWS\_SECRET\_ACCESS\_KEY
+    * PORT (_Optional, just in case you want to run the server locally_, default:9999)
 
 ### API Reference
 - Import this [collection](https://www.getpostman.com/collections/5992381874c2f3e65d33) to your Postman
@@ -150,4 +149,4 @@ These instructions will get you a copy of the project up and running on your loc
 ## Enjoy!
 
 [MD syntax documentation]: <https://confluence.atlassian.com/bitbucketserver/markdown-syntax-guide-776639995.html>
-[Online MD to HTML converter]: <http://dillinger.io/>
+[Online MD to HTML converter]: <http://dillinger.io>
