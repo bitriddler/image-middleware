@@ -1,0 +1,10 @@
+[
+	{
+		"hostName": "abc",
+		"secretKey": "123"
+	}, 
+	{
+		"hostName": "xyz",
+		"secretKey": "789"
+	}
+]
