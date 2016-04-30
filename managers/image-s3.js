@@ -125,15 +125,12 @@ module.exports = {
 		});
 	},
 
-	postImage: function(bucket, imgName, imgRelPath, tempImgPathOnDisk, resizeImgConfig, cb) {
+	postImage: function(bucket, contentType, imgName, tempImgPathOnDisk, resizeImgConfig, cb) {
 		if(!bucket) {
 			return cb(new error(errCode.NullOrEmptyParameter, errMsg.Bucket), null);
 		}
 		if(!imgName) {
 			return cb(new error(errCode.NullOrEmptyParameter, errMsg.ImgName), null);
-		}
-		if(!imgRelPath) {
-			return cb(new error(errCode.NullOrEmptyParameter, errMsg.ImgRelPath), null);
 		}
 		if(!tempImgPathOnDisk) {
 			return cb(new error(errCode.NullOrEmptyParameter, errMsg.TempImgPath), null);
@@ -142,7 +139,7 @@ module.exports = {
 		if(len==0){
 			return cb(new error(errCode.ImageConfigurationError, err), null);
 		}
-		var keys = [];
+		var images = [];
 		var ctr = 0;
 		streamImage(tempImgPathOnDisk);
 		function streamImage(path) {
@@ -154,10 +151,11 @@ module.exports = {
 			}//ORIGINAL: If no w and h is set, then no resizing
 
 			if(resizeImgConfig[ctr].width || resizeImgConfig[ctr].height){
-				var w = resizeImgConfig[ctr].width || Jimp.AUTO;
-				var h = resizeImgConfig[ctr].height || Jimp.AUTO;
-				img.resize(w,h);
+				img.resize(
+					resizeImgConfig[ctr].width || Jimp.AUTO,
+					resizeImgConfig[ctr].height || Jimp.AUTO);
 			}
+			// @todo use the correct mime type of the image
 			img.getBuffer(Jimp.MIME_JPEG, getBufferImage);
 		}
 		function getBufferImage(err, buffer) {
@@ -168,18 +166,23 @@ module.exports = {
 		}
 		function uploadImage(buffer){
 			var prefix = resizeImgConfig[ctr].prefix || '';
-			var key = imgRelPath + prefix + imgName;
-			s3.putObject({ Bucket: bucket, Key: key, Body: buffer }, function (err) {
+			var key = prefix + imgName;
+			s3.putObject({ ContentType: contentType, Bucket: bucket, Key: key, Body: buffer }, function (err) {
 				if (err) {
 					return cb(new error(errCode.AWSInternalServer, err), null);
 				}
+				images.push({
+					url: `https://${bucket}.s3.amazonaws.com/${key}`,
+					width: resizeImgConfig[ctr].width,
+					height: resizeImgConfig[ctr].height,
+					original: !resizeImgConfig[ctr].width && !resizeImgConfig[ctr].height
+				});
 				ctr++;
-				keys.push(key);
 				if(ctr<len) {
 					streamImage(tempImgPathOnDisk);
 				}
 				else {
-					cb(null, keys);
+					cb(null, images);
 				}
 			});
 		}

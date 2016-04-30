@@ -120,27 +120,11 @@ These instructions will get you a copy of the project up and running on your loc
     * _desc_: Post an object (of type image) in a specific bucket
     * _headers_:
         * ``secret-key``: The secret key that authorizes your request
-        * ``resize-img-config``: A stringified array of objects determines the configuration of the original/resized images to be uploaded, that consists of three optional attributes (prefix, width and/or height)
-        *       [
-                    {
-                        //Nulling prefix, width, height means upload as is
-                    }, 
-                    {
-                        "width": 50, //in pixels
-                        "height": 50, //inpixels
-                        "prefix": "thumb-" //to be prepend to the filename
-                    }, 
-                    {
-                        "width": 100, //Height not set, means auto
-                        "prefix": "medium-"
-                    }
-                ]
-        Default: ``[{}]`` that means just upload the original image as is
     * _query_:
         * bucket: Name of the bucket (Case sensitive)
-        * imgRelPath: Relative name of the object in a form of relative path that filename, from file in body, will be appended to it (Case sensitive)
+        * type: Type of upload e.g. product, category, ..etc
     * _body_: Image object (base64)
-    * _return_: Array of keys (full path) of images (original and/or resized one) that has/have been uploaded
+    * _return_: Array of urls of images (original and/or resized one) that has/have been uploaded
     
 ### Run the server
 

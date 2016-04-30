@@ -1,0 +1,26 @@
+{
+  "default": [
+    {
+    }
+  ],
+
+  "product": [
+    {
+    },
+  	{
+      "width": 50,
+      "height": 50,
+      "prefix": "products/thumb-"
+    },
+  	{
+      "width": 150,
+      "height": 150,
+      "prefix": "products/medium-"
+    },
+  	{
+      "width": 250,
+      "height": 250,
+      "prefix": "products/large-"
+    }
+  ]
+}

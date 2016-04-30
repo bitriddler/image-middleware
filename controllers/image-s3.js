@@ -1,7 +1,16 @@
 //Load the needed modules
 var s3 = require('../managers/image-s3');
 var formidable = require('formidable');
+var resizeConfigiurations = require('../config/resize-config.json');
 var resizeImgConfigText = 'resize-img-config';
+
+function getResizeConfig(type) {
+	if(resizeConfigiurations[type]) {
+		return resizeConfigiurations[type];
+	}
+
+	return resizeConfigiurations['default'];
+}
 
 module.exports = function(app) {
 
@@ -71,29 +80,34 @@ module.exports = function(app) {
 			if(err) res.send(err);
 			else{
 				res.writeHead(200, {'Content-Type': 'image/jpg' });
-				res.send(image, 'binary');
+				res.end(image, 'binary');
 			}
 		});
 	});
 
 	//Post image to S3
-	app.post('/post-image', function (req, res){
+	app.post('/post-image', function (req, res, next){
 		var resizeImgConfigHdr = req.header(resizeImgConfigText);
-		var resizeImgConfig = resizeImgConfigHdr ? JSON.parse(resizeImgConfigHdr) : require("../config/defaultResizeImg.json");
-		console.log(resizeImgConfig);
+		var resizeImgConfig = getResizeConfig(req.query.type);
 		var form = new formidable.IncomingForm();
 		form.parse(req);
 		form.on('end', function(fields, files) {
-			if(this.openedFiles[0].size > 2097152) res.send('Image size must not exceed 2MB');
-			else{
-				var postImgOptions = [req.query.bucket, this.openedFiles[0].name,
-				req.query.imgRelPath, this.openedFiles[0].path, resizeImgConfig];
-				s3.postImage(postImgOptions, function(err, keys){
-					if(err) res.send(err);
-					else{
-						res.json(keys);
-					}
-				});
+			if(this.openedFiles[0].size > 2097152) {
+				res.send('Image size must not exceed 2MB');
+			} else {
+				s3.postImage(
+					req.query.bucket,
+					this.openedFiles[0].type,
+					this.openedFiles[0].name,
+					this.openedFiles[0].path,
+					resizeImgConfig,
+					function(err, images){
+						if(err) {
+							next(err);
+						} else {
+							res.json(images);
+						}
+					});
 			}
 		});
 	});

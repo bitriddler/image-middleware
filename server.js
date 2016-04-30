@@ -2,7 +2,9 @@
 var express = require("express");
 var app = express();
 var fs  = require('fs');
-var secretKeyMiddleware = require('./middlewares/secretkey-auth');
+var cors = require('cors');
+var secretKeyAuthMiddleware = require('./middlewares/secretkey-auth');
+var jwtAuthMiddleware = require('./middlewares/jwt-auth');
 var errCode = require("./enums/errCode");
 var error = require("./models/error");
 
@@ -11,8 +13,14 @@ app.get('/', function (req, res){
 	res.end('Welcome to Image S3 middleware server!');
 });
 
+// enable cors
+app.use(cors())
+
 // Authenticate all incoming requests with secret key
-app.use(secretKeyMiddleware);
+// We can switch between secretKeyAuth & jwtAuth middlewares
+// Later we might use both
+// app.use(secretKeyAuthMiddleware);
+// app.use(jwtAuthMiddleware);
 
 //Require controllers
 var controllers_path = __dirname + '/controllers'
@@ -25,13 +33,14 @@ controller_files.forEach(function (file) {
 //Handling Not found error (404)
 app.use(function(req, res, next) {
 	res.status(errCode.NotFound)
-		.send(new error(errCode.NotFound, 'Sorry cant find that!')); 
+		.json(new error(errCode.NotFound, 'Sorry cant find that!')); 
 });
 
-//Handling Image S3 Internal Server (501)
+//Handling Image S3 Internal Server (500)
 app.use(function(err, req, res, next) {
+	console.log(err);
 	res.status(errCode.ImageS3InternalServer)
-		.send(new error(errCode.ImageS3InternalServer, 'Something broke!')); 
+		.json(new error(errCode.ImageS3InternalServer, 'Something broke!')); 
 });
 
 //Running the server and listen to specific port
