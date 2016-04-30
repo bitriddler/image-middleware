@@ -1,10 +1,10 @@
 [
 	{
-		"hostName": "abc",
-		"secretKey": "123"
+		"clientId": "5720b3ef2f82c2601a213d1f",
+		"hostName": "localhost:3000"
 	}, 
 	{
-		"hostName": "xyz",
-		"secretKey": "789"
+		"clientId": "571789828e4bd60300bd91d0",
+		"hostName": "dev-goodsense-cms.herokuapp.com"
 	}
 ]
