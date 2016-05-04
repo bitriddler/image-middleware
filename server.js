@@ -38,9 +38,7 @@ app.use(function(req, res, next) {
 
 //Handling Image S3 Internal Server (500)
 app.use(function(err, req, res, next) {
-	console.log(err);
-	res.status(errCode.ImageS3InternalServer)
-		.json(new error(errCode.ImageS3InternalServer, 'Something broke!')); 
+	res.status(err.statusCode).json(err);
 });
 
 //Running the server and listen to specific port
