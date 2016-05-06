@@ -1,6 +1,7 @@
 var validationCollection = require('../config/validation.json');
-var errCode = require("../enums/errCode");
+var statusCode = require("../enums/statusCode");
 var error = require("../models/error");
+var response = require("../models/response");
 
 //Secret key section
 var secretKeyText = 'secret-key';
@@ -19,11 +20,11 @@ var validateSecretKey = function(secretKey) {
 
 module.exports = function(req, res, next) {
 	if(!req.header(secretKeyText)){ 
-		next(new error(errCode.SecretKeyError, errMsg.SecretKeyMissing));
+		next(new response(statusCode.SecretKeyError, new error(errMsg.SecretKeyMissing)));
 	}
 	
 	else if(!validateSecretKey(req.header(secretKeyText))){ 
-		next(new error(errCode.SecretKeyError, errMsg.SecretKeyInvalid));
+		next(new response(statusCode.SecretKeyError, new error(errMsg.SecretKeyInvalid)));
 	}
 
 	else {

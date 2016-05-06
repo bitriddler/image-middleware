@@ -1,6 +1,7 @@
-var errCode =
+var statusCode =
 {
 	NoCode: 0,
+	Success: 200,
 	SecretKeyError: 999,
 	TokenError: 401,
 	AWSInternalServer: 500,
@@ -13,4 +14,4 @@ var errCode =
 	NotFound: 404
 }
 
-module.exports = errCode;
+module.exports = statusCode;
