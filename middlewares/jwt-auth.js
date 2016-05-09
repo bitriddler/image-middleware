@@ -1,7 +1,8 @@
 var jwt = require('jsonwebtoken');
 var validationCollection = require('../config/validation.json');
-var errCode = require("../enums/errCode");
+var statusCode = require("../enums/statusCode");
 var error = require("../models/error");
+var response = require("../models/response");
 
 var secretKey = process.env.SECRET;
 
@@ -24,18 +25,18 @@ function validateClientId(clientId) {
 
 module.exports = function(req, res, next) {
 	if(! req.header('Authorization')) {
-		return next(new error(errCode.TokenError, errMsg.tokenMissing));
+		return next(new response(statusCode.TokenError, new error(errMsg.tokenMissing)));
 	}
 
 	var decodedToken = decodeToken(req.header('Authorization'));
 
 	if(! decodedToken || !decodedToken.iss) {
-		return next(new error(errCode.TokenError, errMsg.tokenInvalid));
+		return next(new response(statusCode.TokenError, new error(errMsg.tokenInvalid)));
 	}
 
 	// Not a valid client
 	if(!validateClientId(decodedToken.iss)) {
-		return next(new error(errCode.TokenError, errMsg.tokenInvalid));
+		return next(new response(statusCode.TokenError, new error(errMsg.tokenInvalid)));
 	}
 
 	next();

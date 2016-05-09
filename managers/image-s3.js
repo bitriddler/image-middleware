@@ -3,8 +3,9 @@ var AWS = require('aws-sdk'),
 fs = require('fs'),
 Jimp = require("jimp"),
 
-errCode = require("../enums/errCode"),
+statusCode = require("../enums/statusCode"),
 error = require("../models/error");
+response = require("../models/response");
 
 var errMsg = {
 	Bucket : 'Bucket name cannot be null or empty.',
@@ -12,7 +13,8 @@ var errMsg = {
 	Body: 'Object body cannot be null or empty.',
 	ImgName: 'Image name cannot be null or empty.',
 	ImgRelPath: 'Image relative path cannot be null or empty.',
-	TempImgPath: 'Temporary image path cannot be null or empty.'
+	TempImgPath: 'Temporary image path cannot be null or empty.',
+	ImgConfig: 'Image configuration is invalid.'
 }
 
 //Set configuration (Access, Secret, and region)
@@ -29,115 +31,115 @@ module.exports = {
 	listBuckets: function(cb) {
 		s3.listBuckets(function(err, data) {
 			if (err){
-				return cb(new error(errCode.AWSInternalServer, err), null);
+				return cb(new response(statusCode.AWSInternalServer, new error(err)));
 			}
 			var bucketsList = [];
 			for (var index in data.Buckets) {
 				var bucket = data.Buckets[index];
 				bucketsList.push({'name': bucket.Name, 'creation_date': bucket.CreationDate});
 			}
-			cb(null, bucketsList);
+			cb(new response(statusCode.Success, null, bucketsList));
 		});
 	},
 
 	listObjects: function(bucket, cb) {
 		if(!bucket) {
-			return cb(new error(errCode.NullOrEmptyParameter, errMsg.Bucket), null);
+			return cb(new response(statusCode.NullOrEmptyParameter, new error(errMsg.Bucket)));
 		}
 		s3.listObjects({ Bucket: bucket}, function(err, data) {
 			if (err) {
-				return cb(new error(errCode.AWSInternalServer, err), null);
+				return cb(new response(statusCode.AWSInternalServer, new error(err)));
 			}
-			cb(null, data);  
+			cb(new response(statusCode.Success, null, data));
 		});
 	},
 
 	createBucket: function(bucket, cb) {
 		if(!bucket) {
-			return cb(new error(errCode.NullOrEmptyParameter, errMsg.Bucket), null);
+			return cb(new response(statusCode.NullOrEmptyParameter, new error(errMsg.Bucket)));
 		}
 		s3.createBucket({Bucket: bucket}, function(err) {
 			if (err) {
-				return cb(new error(errCode.AWSInternalServer, err), null);
+				return cb(new response(statusCode.AWSInternalServer, new error(err)));
 			}
-			cb(null, "'" + bucket + "' bucket has been created successfully!");  
+			cb(new response(statusCode.Success, null, bucket));
 		});
 	},
 
 	createObject: function(bucket, key, body, cb){
 		if(!bucket) {
-			return cb(new error(errCode.NullOrEmptyParameter, errMsg.Bucket), null);
+			return cb(new response(statusCode.NullOrEmptyParameter, new error(errMsg.Bucket)));
 		}
 		if(!key) {
-			return cb(new error(errCode.NullOrEmptyParameter, errMsg.Key), null);
+			return cb(new response(statusCode.NullOrEmptyParameter, new error(errMsg.Key)));
 		}
 		if(!body) {
-			return cb(new error(errCode.NullOrEmptyParameter, errMsg.Body), null);
+			return cb(new response(statusCode.NullOrEmptyParameter, new error(errMsg.Body)));
 		}
 		//Overwrite the existed key (if exists)
 		s3.upload({ Bucket: bucket, Key: key, Body: body}, function(err, data) {
 			if (err) {
-				return cb(new error(errCode.AWSInternalServer, err), null);
+				return cb(new response(statusCode.AWSInternalServer, new error(err)));
 			}
-			cb(null, "'" + key + "' object in '" + bucket + "' bucket has been created successfully!");  
+			cb(new response(statusCode.Success, null, { Bucket: bucket, Key: key }));
 		});
 	},
 
 	deleteBucket: function(bucket, cb){
 		if(!bucket) {
-			return cb(new error(errCode.NullOrEmptyParameter, errMsg.Bucket), null);
+			return cb(new response(statusCode.NullOrEmptyParameter, new error(errMsg.Bucket)));
 		}
 		s3.deleteBucket({ Bucket: bucket }, function(err) {
 			if (err) {
-				return cb(new error(errCode.AWSInternalServer, err), null);
+				return cb(new response(statusCode.AWSInternalServer, new error(err)));
 			}
-			cb(null, "'" + bucket + "' bucket is successfully deleted!");
+			cb(new response(statusCode.Success, null, bucket));
 		});
 	},
 
 	deleteObject: function(bucket, key, cb){
 		if(!bucket) {
-			return cb(new error(errCode.NullOrEmptyParameter, errMsg.Bucket), null);
+			return cb(new response(statusCode.NullOrEmptyParameter, new error(errMsg.Bucket)));
 		}
 		if(!key) {
-			return cb(new error(errCode.NullOrEmptyParameter, errMsg.Key), null);
+			return cb(new response(statusCode.NullOrEmptyParameter, new error(errMsg.Key)));
 		}
 		s3.deleteObject({ Bucket: bucket, Key: key }, function(err) {
 			if (err) {
-				return cb(new error(errCode.AWSInternalServer, err), null);
+				return cb(new response(statusCode.AWSInternalServer, new error(err)));
 			}
-			cb(null, "'" + key + "' key from '" + bucket + "' bucket is successfully deleted!");
+			cb(new response(statusCode.Success, null, { Bucket: bucket, Key: key }));
 		});
 	},
 
 	getImage: function(bucket, key, cb) {
 		if(!bucket) {
-			return cb(new error(errCode.NullOrEmptyParameter, errMsg.Bucket), null);
+			return cb(new response(statusCode.NullOrEmptyParameter, new error(errMsg.Bucket)));
 		}
 		if(!key) {
-			return cb(new error(errCode.NullOrEmptyParameter, errMsg.Key), null);
+			return cb(new response(statusCode.NullOrEmptyParameter, new error(errMsg.Key)));
 		}
 		s3.getObject({ Bucket: bucket, Key: key }, function(err, data) {
 			if (err) {
-				return cb(new error(errCode.AWSInternalServer, err), null);
+				return cb(new response(statusCode.AWSInternalServer, new error(err)));
 			}
-			cb(null, data.Body);
+			cb(new response(statusCode.Success, null, data.Body));
 		});
 	},
 
 	postImage: function(bucket, contentType, imgName, tempImgPathOnDisk, resizeImgConfig, cb) {
 		if(!bucket) {
-			return cb(new error(errCode.NullOrEmptyParameter, errMsg.Bucket), null);
+			return cb(new error(statusCode.NullOrEmptyParameter, errMsg.Bucket));
 		}
 		if(!imgName) {
-			return cb(new error(errCode.NullOrEmptyParameter, errMsg.ImgName), null);
+			return cb(new response(statusCode.NullOrEmptyParameter, new error(errMsg.ImgName)));
 		}
 		if(!tempImgPathOnDisk) {
-			return cb(new error(errCode.NullOrEmptyParameter, errMsg.TempImgPath), null);
+			return cb(new response(statusCode.NullOrEmptyParameter, new error(errMsg.TempImgPath)));
 		}
 		var len = resizeImgConfig.length;
 		if(len==0){
-			return cb(new error(errCode.ImageConfigurationError, err), null);
+			return cb(new response(statusCode.ImageConfigurationError, new error(errMsg.ImgConfig)));
 		}
 		var images = [];
 		var ctr = 0;
@@ -147,7 +149,7 @@ module.exports = {
 		}
 		function resizeImage(err, img) {
 			if (err) {
-				return cb(new error(errCode.ImageReadingError, err), null);
+				return cb(new response(statusCode.ImageReadingError, new error(err)));
 			}//ORIGINAL: If no w and h is set, then no resizing
 
 			if(resizeImgConfig[ctr].width || resizeImgConfig[ctr].height){
@@ -160,7 +162,7 @@ module.exports = {
 		}
 		function getBufferImage(err, buffer) {
 			if (err) {
-				return cb(new error(errCode.ImageResizingError, err), null);
+				return cb(new response(statusCode.ImageResizingError, new error(err)));
 			}
 			uploadImage(buffer);
 		}
@@ -169,7 +171,7 @@ module.exports = {
 			var key = prefix + imgName;
 			s3.putObject({ ContentType: contentType, Bucket: bucket, Key: key, Body: buffer }, function (err) {
 				if (err) {
-					return cb(new error(errCode.AWSInternalServer, err), null);
+					return cb(new response(statusCode.AWSInternalServer, new error(err)));
 				}
 				images.push({
 					url: `https://${bucket}.s3.amazonaws.com/${key}`,
@@ -182,7 +184,7 @@ module.exports = {
 					streamImage(tempImgPathOnDisk);
 				}
 				else {
-					cb(null, images);
+					cb(new response(statusCode.Success, null, images));
 				}
 			});
 		}

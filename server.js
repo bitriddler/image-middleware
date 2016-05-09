@@ -5,8 +5,9 @@ var fs  = require('fs');
 var cors = require('cors');
 var secretKeyAuthMiddleware = require('./middlewares/secretkey-auth');
 var jwtAuthMiddleware = require('./middlewares/jwt-auth');
-var errCode = require("./enums/errCode");
+var statusCode = require("./enums/statusCode");
 var error = require("./models/error");
+var response = require("./models/response");
 
 //Handle default get request with welcome screen
 app.get('/', function (req, res){
@@ -32,13 +33,14 @@ controller_files.forEach(function (file) {
 
 //Handling Not found error (404)
 app.use(function(req, res, next) {
-	res.status(errCode.NotFound)
-		.json(new error(errCode.NotFound, 'Sorry cant find that!')); 
+	res.status(statusCode.NotFound)
+		.json(err);
 });
 
 //Handling Image S3 Internal Server (500)
 app.use(function(err, req, res, next) {
-	res.status(err.statusCode).json(err);
+	res.status(err.statusCode)
+    .json(err); 
 });
 
 //Running the server and listen to specific port
