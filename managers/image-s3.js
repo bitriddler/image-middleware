@@ -27,6 +27,10 @@ AWS.config.update({
 //Create an instance of S3
 var s3 = new AWS.S3({ endpoint :'https://s3.amazonaws.com' });
 
+function getRandomString(len) {
+	return Math.random().toString(36).substr(2, len).toUpperCase();
+}
+
 module.exports = {
 	listBuckets: function(cb) {
 		s3.listBuckets(function(err, data) {
@@ -157,18 +161,28 @@ module.exports = {
 					resizeImgConfig[ctr].width || Jimp.AUTO,
 					resizeImgConfig[ctr].height || Jimp.AUTO);
 			}
-			// @todo use the correct mime type of the image
-			img.getBuffer(Jimp.MIME_JPEG, getBufferImage);
+
+			// Set mime type from the image name
+			var mime;
+
+			if(imgName.toLowerCase().indexOf(".jp") > -1)  {
+				mime = Jimp.MIME_JPEG;
+			} else if(imgName.toLowerCase().indexOf(".png") > -1) {
+				mime = Jimp.MIME_PNG;
+			} else if(imgName.toLowerCase().indexOf(".bmp") > -1) {
+				mime = Jimp.MIME_BMP;
+			} else {
+				mime = Jimp.MIME_JPEG;
+			}
+
+			img.getBuffer(mime, uploadImage);
 		}
-		function getBufferImage(err, buffer) {
+		function uploadImage(err, buffer) {
 			if (err) {
 				return cb(new response(statusCode.ImageResizingError, new error(err)));
 			}
-			uploadImage(buffer);
-		}
-		function uploadImage(buffer){
 			var prefix = resizeImgConfig[ctr].prefix || '';
-			var key = prefix + imgName;
+			var key = prefix + getRandomString(6) + "-" + imgName;
 			s3.putObject({ ContentType: contentType, Bucket: bucket, Key: key, Body: buffer }, function (err) {
 				if (err) {
 					return cb(new response(statusCode.AWSInternalServer, new error(err)));
