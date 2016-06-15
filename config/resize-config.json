@@ -8,16 +8,19 @@
     {
     },
     {
+      "func": "cover",
       "width": 50,
       "height": 50,
       "prefix": "profiles/thumb"
     },
     {
+      "func": "cover",
       "width": 150,
       "height": 150,
       "prefix": "profiles/medium-"
     },
     {
+      "func": "cover",
       "width": 250,
       "height": 250,
       "prefix": "profiles/large-"
@@ -28,16 +31,19 @@
     {
     },
   	{
+      "func": "cover",
       "width": 50,
       "height": 50,
       "prefix": "products/thumb-"
     },
   	{
+      "func": "contain",
       "width": 150,
       "height": 150,
       "prefix": "products/medium-"
     },
   	{
+      "func": "contain",
       "width": 250,
       "height": 250,
       "prefix": "products/large-"

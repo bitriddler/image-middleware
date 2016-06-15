@@ -156,8 +156,8 @@ module.exports = {
 				return cb(new response(statusCode.ImageReadingError, new error(err)));
 			}//ORIGINAL: If no w and h is set, then no resizing
 
-			if(resizeImgConfig[ctr].width || resizeImgConfig[ctr].height){
-				img.cover(
+			if(resizeImgConfig[ctr].func && (resizeImgConfig[ctr].width || resizeImgConfig[ctr].height)) {
+				img[resizeImgConfig[ctr].func](
 					resizeImgConfig[ctr].width || Jimp.AUTO,
 					resizeImgConfig[ctr].height || Jimp.AUTO);
 			}
