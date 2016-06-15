@@ -157,7 +157,7 @@ module.exports = {
 			}//ORIGINAL: If no w and h is set, then no resizing
 
 			if(resizeImgConfig[ctr].width || resizeImgConfig[ctr].height){
-				img.resize(
+				img.cover(
 					resizeImgConfig[ctr].width || Jimp.AUTO,
 					resizeImgConfig[ctr].height || Jimp.AUTO);
 			}

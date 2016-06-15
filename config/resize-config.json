@@ -4,6 +4,26 @@
     }
   ],
 
+  "profile": [
+    {
+    },
+    {
+      "width": 50,
+      "height": 50,
+      "prefix": "profiles/thumb"
+    },
+    {
+      "width": 150,
+      "height": 150,
+      "prefix": "profiles/medium-"
+    },
+    {
+      "width": 250,
+      "height": 250,
+      "prefix": "profiles/large-"
+    }
+  ],
+
   "product": [
     {
     },
